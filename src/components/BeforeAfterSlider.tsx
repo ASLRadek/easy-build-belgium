@@ -50,6 +50,26 @@ const BeforeAfterSlider = () => {
 
   const currentProject = projects[currentSlide];
 
+  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    const container = e.currentTarget.parentElement;
+    if (!container) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const rect = container.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const percentage = (x / rect.width) * 100;
+      setSliderPosition(Math.max(0, Math.min(100, percentage)));
+    };
+
+    const handleMouseUp = () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+  };
+
   return (
     <section className="py-20 bg-white">
       <div className="container mx-auto px-4">
@@ -93,24 +113,7 @@ const BeforeAfterSlider = () => {
             <div 
               className="absolute top-0 bottom-0 w-1 bg-white cursor-ew-resize shadow-lg z-10"
               style={{ left: `${sliderPosition}%` }}
-              onMouseDown={(e) => {
-                const handleMouseMove = (e: MouseEvent) => {
-                  const rect = e.currentTarget?.getBoundingClientRect();
-                  if (rect) {
-                    const x = e.clientX - rect.left;
-                    const percentage = (x / rect.width) * 100;
-                    setSliderPosition(Math.max(0, Math.min(100, percentage)));
-                  }
-                };
-
-                const handleMouseUp = () => {
-                  document.removeEventListener('mousemove', handleMouseMove);
-                  document.removeEventListener('mouseup', handleMouseUp);
-                };
-
-                document.addEventListener('mousemove', handleMouseMove);
-                document.addEventListener('mouseup', handleMouseUp);
-              }}
+              onMouseDown={handleMouseDown}
             >
               <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-white rounded-full shadow-lg flex items-center justify-center">
                 <div className="w-1 h-4 bg-gray-400 mx-0.5"></div>
